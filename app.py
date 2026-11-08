@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+from database import save_traffic
 
 st.set_page_config(
     page_title="Прогнозування забруднення",
@@ -46,6 +47,31 @@ speed = st.number_input(
 if st.button("Розрахувати викиди"):
     factor = vehicle_types[vehicle]
     emissions = count * distance * factor
+
+    
+    vehicle_ids = {
+        "Легковий автомобіль": 1,
+        "Вантажний автомобіль": 2,
+        "Автобус": 3,
+        "Мотоцикл": 4
+    }
+
+    try:
+        record_id = save_traffic(
+            vehicle_ids[vehicle],
+            count,
+            speed,
+            distance
+        )
+
+        st.success(
+            f"Запис №{record_id} збережено в PostgreSQL!"
+        )
+
+    except Exception as error:
+        st.error("Помилка збереження в PostgreSQL")
+        st.code(type(error).__name__)
+
 
     st.success("Розрахунок виконано!")
 
